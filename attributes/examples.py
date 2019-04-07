@@ -18,6 +18,14 @@ class info(Attribute):
         return Attribute.get_attrs(obj, info, inherit=inherit)
 
     @classmethod
+    def get_all_as_dict(cls, obj, *, inherit=False):
+        d = {}
+        for attr in reversed(cls.get_all(obj, inherit=inherit)):
+            # reversed so we can override parent.
+            d[attr.name] = attr.value
+        return d
+
+    @classmethod
     def get_value(cls, obj, name, *, inherit=False):
         for attr in Attribute.get_attrs(obj, info, inherit=inherit):
             if attr.name == name:
