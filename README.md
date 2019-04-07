@@ -1,5 +1,9 @@
 # attributes
 
+![GitHub](https://img.shields.io/github/license/Cologler/attributes-python.svg)
+[![Build Status](https://travis-ci.com/Cologler/attributes-python.svg?branch=master)](https://travis-ci.com/Cologler/click-anno-python)
+[![PyPI](https://img.shields.io/pypi/v/attributes.svg)](https://pypi.org/project/attributes/)
+
 a python version attribute like attribute of csharp.
 
 ## Usage
