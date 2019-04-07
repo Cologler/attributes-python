@@ -70,10 +70,16 @@ class Attribute(metaclass=AttributeMetaClass):
 
     @classmethod
     def get_attrs(cls, obj, attr_type=None, *, inherit=False):
+        '''
+        gets the all attrs from `obj` which match `attr_type`.
+        '''
         return tuple(cls._iter_attrs(obj, attr_type, inherit=inherit))
 
     @classmethod
     def get_attr(cls, obj, attr_type, *, inherit=False):
+        '''
+        gets the first attr from `obj` which match `attr_type`.
+        '''
         if attr_type is None:
             raise ValueError
         for attr in cls._iter_attrs(obj, attr_type, inherit=inherit):
