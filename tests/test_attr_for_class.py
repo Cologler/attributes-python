@@ -29,11 +29,36 @@ def test_get_attrs():
     attr, = attrs
     assert attr.args == (1, 2)
 
+def test_get_attrs_order():
+    @Data(2)
+    @Data(1)
+    class Kls:
+        pass
+
+    attrs = Attribute.get_attrs(Kls)
+    assert tuple(a.args[0] for a in attrs) == (1, 2)
+
 def test_get_attrs_by_inherit():
     attrs = Attribute.get_attrs(SomeClassSub)
     assert len(attrs) == 0
     attrs = Attribute.get_attrs(SomeClassSub, inherit=True)
     assert len(attrs) == 1
+
+def test_get_attrs_order_by_inherit():
+    @Data(3)
+    class C1:
+        pass
+
+    @Data(2)
+    class C2(C1):
+        pass
+
+    @Data(1)
+    class C3(C2):
+        pass
+
+    attrs = Attribute.get_attrs(C3, inherit=True)
+    assert tuple(a.args[0] for a in attrs) == (1, 2, 3)
 
 def test_get_attr():
     attr = Attribute.get_attr(SomeClass, UnUsed)
