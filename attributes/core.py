@@ -5,7 +5,7 @@
 #
 # ----------
 
-from typing import Optional
+from typing import Optional, Any
 
 
 ATTR_NAME = '__cologler.attributes__'
@@ -39,19 +39,33 @@ class AttributeMetaClass(type):
                 for attr_cls, factory in attrs_list:
                     if attr_cls == self:
                         raise SyntaxError(f'attribute {self} did not allow multiple')
+            def factory():
+                attr: Attribute = type.__call__(self, *args, **kwargs)
+                attr._origin_target = obj
+                return attr
             attrs_list.append(
                 # (cls, factory)
-                (self, lambda: type.__call__(self, *args, **kwargs))
+                (self, factory)
             )
             return obj
         return attr_appender
 
 
 class Attribute(metaclass=AttributeMetaClass):
+    _origin_target: Any
+    _target: Any
 
     def __init_subclass__(cls, *args, **kwargs):
         # so we can add `allow_multiple` kwargs.
         pass
+
+    @property
+    def origin_target(self):
+        return self._origin_target
+
+    @property
+    def target(self):
+        return self._target
 
     @classmethod
     def _iter_attr_factorys(cls, obj, attr_type=None, *, inherit=False):
@@ -66,7 +80,9 @@ class Attribute(metaclass=AttributeMetaClass):
     @classmethod
     def _iter_attrs(cls, obj, attr_type=None, *, inherit=False):
         for factory in cls._iter_attr_factorys(obj, attr_type, inherit=inherit):
-            yield factory()
+            attr = factory()
+            attr._target = obj
+            yield attr
 
     @classmethod
     def get_attrs(cls, obj, attr_type=None, *, inherit=False):
