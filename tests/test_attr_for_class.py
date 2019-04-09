@@ -36,7 +36,7 @@ def test_get_attrs_order():
         pass
 
     attrs = Attribute.get_attrs(Kls)
-    assert tuple(a.args[0] for a in attrs) == (1, 2)
+    assert tuple(a.args[0] for a in attrs) == (2, 1)
 
 def test_get_attrs_by_inherit():
     attrs = Attribute.get_attrs(SomeClassSub)

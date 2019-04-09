@@ -73,7 +73,7 @@ class Attribute(metaclass=AttributeMetaClass):
             for subcls in obj.__mro__:
                 yield from cls._iter_attr_factorys(subcls, attr_type, inherit=False)
         else:
-            for attr_cls, factory in vars(obj).get(ATTR_NAME, ()):
+            for attr_cls, factory in reversed(vars(obj).get(ATTR_NAME, ())):
                 if attr_type is None or issubclass(attr_cls, attr_type):
                     yield factory
 

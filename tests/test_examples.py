@@ -6,23 +6,53 @@
 # ----------
 
 from attributes.examples import (
-    info
+    info, props
 )
 
-@info('name', 'boy')
-@info('age', 12)
-class CS:
-    pass
-
 def test_info_get_value():
-    assert info.get_value(CS, 'name') == 'boy'
+    @info('name', 'eva')
+    class Person: pass
+    assert info.get_value(Person, 'name') == 'eva'
 
 def test_info_get_all():
-    infos = info.get_all(CS)
-    assert len(infos) == 2
-    assert tuple(i.name for i in infos) == ('age', 'name')
+    @info('name', 'eva')
+    @info('age', 12)
+    class Person: pass
+    infos = info.get_all(Person)
+    assert tuple(i.name for i in infos) == ('name', 'age', )
 
 def test_info_get_all_as_dict():
-    infos = info.get_all_as_dict(CS)
+    @info('name', 'eva')
+    @info('age', 12)
+    class Person: pass
+    infos = info.get_all_as_dict(Person)
     assert isinstance(infos, dict)
-    assert infos['name'] == 'boy'
+    assert infos['name'] == 'eva'
+
+def test_info_get_all_as_dict_override():
+    @info('name', 'eva')
+    @info('name', 'john')
+    class Person: pass
+    infos = info.get_all_as_dict(Person)
+    assert isinstance(infos, dict)
+    assert infos['name'] == 'eva'
+
+def test_info_doc_examples():
+    @info('name', 'eva')
+    class Person: pass
+    assert info.get_value(Person, 'name') == 'eva'
+
+def test_props_get_as_dict_inherit():
+    @props(age=12, name='no-name')
+    class Animal: pass
+    @props(name='eva')
+    class Person(Animal): pass
+    assert props.get_as_dict(Person, inherit=True) == {
+        'name': 'eva',
+        'age': 12
+    }
+
+def test_props_doc_examples():
+    @props(name='eva')
+    class Person: pass
+    assert props.get_as_dict(Person)['name'] == 'eva'

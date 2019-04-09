@@ -38,8 +38,8 @@ def test_allow_multiple():
     attrs = Attribute.get_attrs(SomeClass)
     assert len(attrs) == 2
     a1, a2 = attrs
-    assert a1.value == (3, 4)
-    assert a2.value == (1, 2)
+    assert a1.value == (1, 2)
+    assert a2.value == (3, 4)
 
 def test_not_allow_multiple():
     class Data(Attribute, allow_multiple=False):
