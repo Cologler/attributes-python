@@ -38,8 +38,28 @@ def test_allow_multiple():
     attrs = Attribute.get_attrs(SomeClass)
     assert len(attrs) == 2
     a1, a2 = attrs
-    assert a1.value == (3, 4)
-    assert a2.value == (1, 2)
+    assert a1.value == (1, 2)
+    assert a2.value == (3, 4)
+
+def test_allow_multiple_inherit_behavior():
+    class Default(Attribute):
+        pass
+
+    assert Default.allow_multiple
+
+    class AllowMultiple(Attribute, allow_multiple=True):
+        pass
+
+    assert AllowMultiple.allow_multiple
+
+    class NotAllowMultiple(Attribute, allow_multiple=False):
+        pass
+
+    assert not NotAllowMultiple.allow_multiple
+
+    with raises(ValueError):
+        class CannotBeAllowMultiAgain(NotAllowMultiple, allow_multiple=True):
+            pass
 
 def test_not_allow_multiple():
     class Data(Attribute, allow_multiple=False):
@@ -51,7 +71,7 @@ def test_not_allow_multiple():
         class SomeClass:
             pass
 
-def test_not_allow_multiple_than_subclass_should_not():
+def test_not_allow_multiple_with_inherit():
     class Data(Attribute, allow_multiple=False):
         pass
 
@@ -60,6 +80,12 @@ def test_not_allow_multiple_than_subclass_should_not():
 
     with raises(SyntaxError):
         @SubData()
+        @SubData()
+        class SomeClass:
+            pass
+
+    with raises(SyntaxError):
+        @Data()
         @SubData()
         class SomeClass:
             pass

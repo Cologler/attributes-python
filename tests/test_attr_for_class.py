@@ -36,7 +36,7 @@ def test_get_attrs_order():
         pass
 
     attrs = Attribute.get_attrs(Kls)
-    assert tuple(a.args[0] for a in attrs) == (1, 2)
+    assert tuple(a.args[0] for a in attrs) == (2, 1)
 
 def test_get_attrs_by_inherit():
     attrs = Attribute.get_attrs(SomeClassSub)
@@ -98,3 +98,11 @@ def test_get_inherited_attr():
 def test_has_attr():
     assert not Attribute.has_attr(SomeClass, UnUsed)
     assert Attribute.has_attr(SomeClass, Data)
+
+def test_attr_origin_target():
+    attr = Attribute.get_attr(SomeClassSub, Data, inherit=True)
+    assert attr.origin_target is SomeClass
+
+def test_attr_target():
+    attr = Attribute.get_attr(SomeClassSub, Data, inherit=True)
+    assert attr.target is SomeClassSub
