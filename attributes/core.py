@@ -86,44 +86,57 @@ class Attribute(metaclass=AttributeMetaClass):
     def target(self):
         return self._target
 
-    @classmethod
-    def _iter_attr_factorys(cls, obj, attr_type=None, *, inherit=False):
+    @staticmethod
+    def _iter_attr_factorys(obj, attr_type=None, *, inherit=False):
         if inherit and isinstance(obj, type):
             for subcls in obj.__mro__:
-                yield from cls._iter_attr_factorys(subcls, attr_type, inherit=False)
+                yield from Attribute._iter_attr_factorys(subcls, attr_type, inherit=False)
         else:
             for attr_cls, factory in reversed(vars(obj).get(ATTR_NAME, ())):
                 if attr_type is None or issubclass(attr_cls, attr_type):
                     yield factory
 
-    @classmethod
-    def _iter_attrs(cls, obj, attr_type=None, *, inherit=False):
-        for factory in cls._iter_attr_factorys(obj, attr_type, inherit=inherit):
+    @staticmethod
+    def _iter_attrs(obj, attr_type=None, *, inherit=False):
+        for factory in Attribute._iter_attr_factorys(obj, attr_type, inherit=inherit):
             yield factory(target=obj)
 
-    @classmethod
-    def get_attrs(cls, obj, attr_type=None, *, inherit=False):
+    @staticmethod
+    def get_attrs(obj, attr_type=None, *, inherit=False) -> tuple:
         '''
-        gets the all attrs from `obj` which match `attr_type`.
+        gets all attrs from `obj` which match `attr_type`.
         '''
-        return tuple(cls._iter_attrs(obj, attr_type, inherit=inherit))
+        return tuple(Attribute._iter_attrs(obj, attr_type, inherit=inherit))
 
-    @classmethod
-    def get_attr(cls, obj, attr_type, *, inherit=False):
+    @staticmethod
+    def get_attr(obj, attr_type, *, inherit=False):
         '''
-        gets the first attr from `obj` which match `attr_type`.
+        gets the first attr from `obj` which match `attr_type`, or `None`.
         '''
         if attr_type is None:
             raise ValueError
-        for attr in cls._iter_attrs(obj, attr_type, inherit=inherit):
+        for attr in Attribute._iter_attrs(obj, attr_type, inherit=inherit):
             return attr
-        return None
 
-    @classmethod
-    def has_attr(cls, obj, attr_type, *, inherit=False):
+    @staticmethod
+    def has_attr(obj, attr_type, *, inherit=False):
         '''
         check whether the `obj` has some attr.
         '''
-        for factory in cls._iter_attr_factorys(obj, attr_type, inherit=inherit):
+        for factory in Attribute._iter_attr_factorys(obj, attr_type, inherit=inherit):
             return True
         return False
+
+    @classmethod
+    def attrs_from(cls, obj, *, inherit=False) -> tuple:
+        '''
+        gets all attrs from `obj` which match this attr type.
+        '''
+        return Attribute.get_attrs(obj, cls, inherit=inherit)
+
+    @classmethod
+    def attr_from(cls, obj, *, inherit=False):
+        '''
+        gets the first attr from `obj` which match this attr type, or `None`.
+        '''
+        return Attribute.get_attr(obj, cls, inherit=inherit)
