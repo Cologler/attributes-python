@@ -21,7 +21,7 @@ setup(
     long_description_content_type='text/markdown',
     packages=find_packages(),
     name='attributes',
-    version='0.0.2',
+    version='0.0.3',
     description='',
     keywords=[],
     author='Cologler',
