@@ -106,3 +106,20 @@ def test_attr_origin_target():
 def test_attr_target():
     attr = Attribute.get_attr(SomeClassSub, Data, inherit=True)
     assert attr.target is SomeClassSub
+
+def test_attr_init_targets():
+    class RequiredError(Exception):
+        pass
+
+    class SomeAttr(Attribute):
+        def __init__(self):
+            assert self.target is SomeClassExample
+            assert self.origin_target is SomeClassExample
+            raise RequiredError
+
+    @SomeAttr()
+    class SomeClassExample:
+        pass
+
+    with raises(RequiredError):
+        SomeAttr.get_attr(SomeClassExample, SomeAttr)

@@ -51,9 +51,12 @@ class AttributeMetaClass(type):
                 for attr_cls, factory in attrs_list:
                     if attr_cls._multiple_tag is self._multiple_tag:
                         raise SyntaxError(f'attribute {self} did not allow multiple')
-            def factory():
-                attr: Attribute = type.__call__(self, *args, **kwargs)
-                attr._origin_target = obj
+            def factory(*, target):
+                attr: Attribute = self.__new__(self)
+                if attr is not None and isinstance(attr, Attribute):
+                    attr._origin_target = obj
+                    attr._target = target
+                    self.__init__(attr, *args, **kwargs)
                 return attr
             attrs_list.append(
                 # (cls, factory)
@@ -96,9 +99,7 @@ class Attribute(metaclass=AttributeMetaClass):
     @classmethod
     def _iter_attrs(cls, obj, attr_type=None, *, inherit=False):
         for factory in cls._iter_attr_factorys(obj, attr_type, inherit=inherit):
-            attr = factory()
-            attr._target = obj
-            yield attr
+            yield factory(target=obj)
 
     @classmethod
     def get_attrs(cls, obj, attr_type=None, *, inherit=False):
