@@ -24,20 +24,18 @@ class info(Attribute):
         self.value = value
 
     @classmethod
-    def get_all(cls, obj, *, inherit=False):
-        return Attribute.get_attrs(obj, info, inherit=inherit)
-
-    @classmethod
-    def get_all_as_dict(cls, obj, *, inherit=False):
+    def get_as_dict(cls, obj, *, inherit=False):
+        ''' gets all `info` and combine as a single `dict` '''
         d = {}
-        for attr in reversed(cls.get_all(obj, inherit=inherit)):
+        for attr in reversed(cls.get_from(obj, inherit=inherit)):
             # reversed so we can override parent.
             d[attr.name] = attr.value
         return d
 
     @classmethod
     def get_value(cls, obj, name, default=None, *, inherit=False):
-        for attr in Attribute.get_attrs(obj, info, inherit=inherit):
+        ''' gets the first `info` match that `name` '''
+        for attr in cls.get_from(obj, inherit=inherit):
             if attr.name == name:
                 return attr.value
         return default
@@ -58,7 +56,7 @@ class props(Attribute):
 
     @classmethod
     def get_as_dict(cls, obj, *, inherit=False):
-        attrs = Attribute.get_attrs(obj, props, inherit=inherit)
+        attrs = cls.get_from(obj, inherit=inherit)
         d = {}
         for attr in reversed(attrs):
             # reversed so we can override parent.

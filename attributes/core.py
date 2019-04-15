@@ -128,15 +128,17 @@ class Attribute(metaclass=AttributeMetaClass):
         return False
 
     @classmethod
-    def attrs_from(cls, obj, *, inherit=False) -> tuple:
+    def get_from(cls, obj, *, inherit=False) -> tuple:
         '''
-        gets all attrs from `obj` which match this attr type.
+        gets all attrs from `obj` which match the attr type.
         '''
         return Attribute.get_attrs(obj, cls, inherit=inherit)
 
+    attrs_from = get_from
+
     @classmethod
-    def attr_from(cls, obj, *, inherit=False):
+    def get_first_from(cls, obj, *, inherit=False):
         '''
-        gets the first attr from `obj` which match this attr type, or `None`.
+        gets the first attr from `obj` which match the attr type, or `None`.
         '''
         return Attribute.get_attr(obj, cls, inherit=inherit)

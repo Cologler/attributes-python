@@ -18,22 +18,22 @@ def test_info_get_all():
     @info('name', 'eva')
     @info('age', 12)
     class Person: pass
-    infos = info.get_all(Person)
+    infos = info.get_from(Person)
     assert tuple(i.name for i in infos) == ('name', 'age', )
 
-def test_info_get_all_as_dict():
+def test_info_get_as_dict():
     @info('name', 'eva')
     @info('age', 12)
     class Person: pass
-    infos = info.get_all_as_dict(Person)
+    infos = info.get_as_dict(Person)
     assert isinstance(infos, dict)
     assert infos['name'] == 'eva'
 
-def test_info_get_all_as_dict_override():
+def test_info_get_as_dict_override():
     @info('name', 'eva')
     @info('name', 'john')
     class Person: pass
-    infos = info.get_all_as_dict(Person)
+    infos = info.get_as_dict(Person)
     assert isinstance(infos, dict)
     assert infos['name'] == 'eva'
 
