@@ -9,8 +9,7 @@ from typing import Optional, Any
 from enum import IntEnum, auto
 from collections import namedtuple
 
-
-_ATTR_NAME = '__cologler.attributes__'
+from .store import get_attrs_list, get_func_param_dict
 
 
 _AttrData = namedtuple('_AttrData', [
@@ -24,7 +23,6 @@ class ParamOf:
     '''
     The parameter of the function.
     '''
-    _CACHE_ATTR_NAME = '__cologler.attributes.params__'
 
     def __init__(self, func, param_name):
         self._func = func
@@ -39,10 +37,7 @@ class ParamOf:
         return self._param_name
 
     def __new__(cls, func, param_name):
-        params_dict = getattr(func, cls._CACHE_ATTR_NAME, None)
-        if params_dict is None:
-            params_dict = {}
-            setattr(func, cls._CACHE_ATTR_NAME, params_dict)
+        params_dict = get_func_param_dict(func)
         param = params_dict.get(param_name)
         if param is None:
             param = object.__new__(cls)
@@ -86,10 +81,7 @@ class _AttributeMetaClass(type):
     def __call__(self, *args, **kwargs):
         def attr_attacher(obj):
             # get or init attrs_list
-            attrs_list = vars(obj).get(_ATTR_NAME, None)
-            if attrs_list is None:
-                attrs_list = []
-                setattr(obj, _ATTR_NAME, attrs_list)
+            attrs_list = get_attrs_list(obj, list)
 
             if not self._allow_multiple:
                 for data in attrs_list:
@@ -154,7 +146,8 @@ class Attribute(metaclass=_AttributeMetaClass):
             for subcls in obj.__mro__:
                 yield from Attribute._iter_attr_factorys(subcls, attr_type, inherit=False)
         else:
-            for data in reversed(vars(obj).get(_ATTR_NAME, ())):
+            attrs_list = get_attrs_list(obj) or ()
+            for data in reversed(attrs_list):
                 if attr_type is None or issubclass(data.attr_type, attr_type):
                     yield data.factory
 
