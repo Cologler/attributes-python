@@ -58,6 +58,7 @@ class AttributeMetaClass(type):
                     attr._target = target
                     self.__init__(attr, *args, **kwargs)
                 return attr
+            self.on_attach(obj)
             attrs_list.append(
                 # (cls, factory)
                 (self, factory)
@@ -76,6 +77,14 @@ class Attribute(metaclass=AttributeMetaClass):
 
     def __init_subclass__(cls, *args, **kwargs):
         # so we can add `allow_multiple` kwargs.
+        pass
+
+    @classmethod
+    def on_attach(cls, target):
+        '''
+        call when the `Attribute` attach on some target.
+        You may want to do something like add them into a list?
+        '''
         pass
 
     @property
