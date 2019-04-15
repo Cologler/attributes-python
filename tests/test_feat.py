@@ -93,3 +93,16 @@ def test_not_allow_multiple_with_inherit():
     with raises(ValueError):
         class SubData_2(Data, allow_multiple=True):
             pass
+
+def test_on_attach():
+    class PubFunc(Attribute):
+        items = []
+        @classmethod
+        def on_attach(cls, target):
+            cls.items.append(target)
+
+    @PubFunc()
+    def func():
+        pass
+
+    assert PubFunc.items == [func]

@@ -5,4 +5,4 @@
 #
 # ----------
 
-from .core import Attribute
+from .core import Attribute, param_attr, param_of

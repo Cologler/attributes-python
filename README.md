@@ -22,3 +22,15 @@ class SomeClass:
 
 data, = Attribute.get_attrs(SomeClass) # than load on runtime and use it.
 ```
+
+### Parameter Attribute
+
+``` py
+@param_attr('a', Data(1, 2), Data(3, 4))
+def func(a):
+    pass
+
+data, = Attribute.get_attrs(param_of(func, 'a'))
+# or
+data, = Data.get_from_param(func, 'a')
+```
