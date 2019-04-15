@@ -8,7 +8,8 @@
 import weakref
 weakref.WeakKeyDictionary
 
-_ATTRS = weakref.WeakKeyDictionary()
+_ATTRS_WEAK = weakref.WeakKeyDictionary()
+_ATTRS = {}
 _FUNC_PARAM_DICT_WEAK = weakref.WeakKeyDictionary()
 _FUNC_PARAM_DICT = {}
 
@@ -45,26 +46,18 @@ def _set_dict(d, k, v) -> bool:
         # cannot create weak reference
         return False
 
-def _get_value(obj, attr_key: str, fallback_dict: dict, factory):
-    ret = _get_attr(obj, attr_key) or fallback_dict.get(obj)
-    if ret is None and factory is not None:
-        ret = factory()
-        try:
-            setattr(obj, attr_key, ret)
-        except (TypeError, AttributeError):
-            fallback_dict[obj] = ret
-    return ret
-
 def get_attrs_list(obj, factory=None):
     '''
     gets attrs list from `obj`.
 
     if `factory` is not `None`, use factory create default instance.
     '''
-    ret = _get_attr(obj, _ATTRS_NAME) or _ATTRS.get(obj)
+    ret = _get_attr(obj, _ATTRS_NAME) or _get_dict(_ATTRS_WEAK, obj) or _get_dict(_ATTRS, obj)
     if ret is None and factory is not None:
         ret = factory()
-        _set_attr(obj, _ATTRS_NAME, ret) or _set_dict(_ATTRS, obj, ret)
+        assert _set_attr(obj, _ATTRS_NAME, ret) or \
+               _set_dict(_ATTRS_WEAK, obj, ret) or \
+               _set_dict(_ATTRS, obj, ret)
     return ret
 
 def get_func_param_dict(func):

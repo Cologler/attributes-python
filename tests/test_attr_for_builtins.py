@@ -17,6 +17,16 @@ def test_str():
 
     assert len(Data.get_from(str)) == 1
 
+def test_str_method():
+    Data()(str.join)
+
+    assert len(Data.get_from(str.join)) == 1
+
+def test_str_method_params():
+    param_attr('self', Data())(str.join)
+
+    assert len(Data.get_from_param(str.join, 'self')) == 1
+
 def test_int():
     Data()(int)
 
@@ -26,9 +36,4 @@ def test_bool():
     Data()(bool)
 
     assert len(Data.get_from(bool)) == 1
-
-def test_str_method():
-    param_attr('self', Data())(str.join)
-
-    assert len(Data.get_from_param(str.join, 'self')) == 1
 
