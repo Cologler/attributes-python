@@ -10,11 +10,8 @@ weakref.WeakKeyDictionary
 
 _ATTRS_WEAK = weakref.WeakKeyDictionary()
 _ATTRS = {}
-_FUNC_PARAM_DICT_WEAK = weakref.WeakKeyDictionary()
-_FUNC_PARAM_DICT = {}
 
 _ATTRS_NAME = '__cologler.attributes__'
-_FUNC_PARAM_DICT_NAME = '__cologler.attributes.params__'
 
 def _get_attr(obj, k):
     try:
@@ -46,27 +43,34 @@ def _set_dict(d, k, v) -> bool:
         # cannot create weak reference
         return False
 
-def get_attrs_list(obj, factory=None):
-    '''
-    gets attrs list from `obj`.
+class AttrsList(list):
+    paramsdict: dict=None
 
-    if `factory` is not `None`, use factory create default instance.
+    def __bool__(self):
+        # so we can use `_get_attr` and `_get_dict` chain without recreate new instance.
+        return True
+
+
+def get_attrs_list(obj):
     '''
-    ret = _get_attr(obj, _ATTRS_NAME) or _get_dict(_ATTRS_WEAK, obj) or _get_dict(_ATTRS, obj)
-    if ret is None and factory is not None:
-        ret = factory()
+    gets attrs list from `obj`, return `None` if not created.
+    '''
+    return _get_attr(obj, _ATTRS_NAME) or _get_dict(_ATTRS_WEAK, obj) or _get_dict(_ATTRS, obj)
+
+def get_or_create_attrs_list(obj):
+    '''
+    get or create attrs list from `obj`.
+    '''
+    ret = get_attrs_list(obj)
+    if ret is None:
+        ret = AttrsList()
         assert _set_attr(obj, _ATTRS_NAME, ret) or \
                _set_dict(_ATTRS_WEAK, obj, ret) or \
                _set_dict(_ATTRS, obj, ret)
     return ret
 
 def get_func_param_dict(func):
-    ret = _get_attr(func, _FUNC_PARAM_DICT_NAME) or \
-          _get_dict(_FUNC_PARAM_DICT, func) or \
-          _get_dict(_FUNC_PARAM_DICT_WEAK, func)
-    if ret is None:
-        ret = {}
-        assert _set_attr(func, _FUNC_PARAM_DICT_NAME, ret) or \
-               _set_dict(_FUNC_PARAM_DICT_WEAK, func, ret) or \
-               _set_dict(_FUNC_PARAM_DICT, func, ret)
-    return ret
+    attrs_list = get_or_create_attrs_list(func)
+    if attrs_list.paramsdict is None:
+        attrs_list.paramsdict = {}
+    return attrs_list.paramsdict

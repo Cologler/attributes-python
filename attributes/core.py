@@ -9,7 +9,7 @@ from typing import Optional, Any
 from enum import IntEnum, auto
 from collections import namedtuple
 
-from .store import get_attrs_list, get_func_param_dict
+from .store import get_or_create_attrs_list, get_attrs_list, get_func_param_dict
 
 
 _AttrData = namedtuple('_AttrData', [
@@ -37,6 +37,8 @@ class ParamOf:
         return self._param_name
 
     def __new__(cls, func, param_name):
+        if not isinstance(param_name, str):
+            raise TypeError
         params_dict = get_func_param_dict(func)
         param = params_dict.get(param_name)
         if param is None:
@@ -81,7 +83,7 @@ class _AttributeMetaClass(type):
     def __call__(self, *args, **kwargs):
         def attr_attacher(obj):
             # get or init attrs_list
-            attrs_list = get_attrs_list(obj, list)
+            attrs_list = get_or_create_attrs_list(obj)
 
             if not self._allow_multiple:
                 for data in attrs_list:
